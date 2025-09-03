@@ -12,7 +12,7 @@ export default function App() {
     const [page, setPage] = useState('splash');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-    // Simulate loading and auth check
+    // Simulate loading and auth checking
     useEffect(() => {
         const timer = setTimeout(() => {
             setPage(isAuthenticated ? 'main' : 'login');
