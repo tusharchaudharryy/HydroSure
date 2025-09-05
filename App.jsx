@@ -1,7 +1,8 @@
-// FILE: varify-app/App.jsx
-
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, ActivityIndicator, View } from 'react-native';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './src/firebase'; // Import auth from your firebase config
+
 
 import { styles } from './src/styles/globalStyles';
 import { SplashScreen } from './src/screens/SplashScreen';
@@ -11,29 +12,52 @@ import { MainAppNavigator } from './src/navigation/MainAppNavigator';
 export default function App() {
     const [page, setPage] = useState('splash');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // To handle initial auth check
+    const [user, setUser] = useState(null); // <-- Add state to hold the user object
 
-    // Simulate loading and auth checking
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setPage(isAuthenticated ? 'main' : 'login');
-        }, 2000);
-        return () => clearTimeout(timer);
-    }, [isAuthenticated]);
+        // onAuthStateChanged returns an unsubscribe function
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser); // <-- Store the full user object from Firebase
+            if (currentUser) {
+                // User is signed in
+                setIsAuthenticated(true);
+            } else {
+                // User is signed out
+                setIsAuthenticated(false);
+            }
+            // Finished checking auth state
+            setIsLoading(false);
+            setPage(currentUser ? 'main' : 'login');
+        });
+
+        // Cleanup subscription on unmount
+        return unsubscribe;
+    }, []);
 
     const handleLogin = () => {
+        // This is now handled by onAuthStateChanged,
+        // but we can keep it to manually set the page if needed,
+        // though it's better to rely on the listener.
         setIsAuthenticated(true);
         setPage('main');
     };
 
     const handleLogout = () => {
-        setIsAuthenticated(false);
-        setPage('login');
+        signOut(auth).catch(error => console.error("Sign out error", error));
+        // The onAuthStateChanged listener will handle setting isAuthenticated to false
+    }
+
+    if (isLoading) {
+        // You can show a loading spinner or splash screen while checking auth
+        return (
+            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" />
+            </View>
+        );
     }
 
     const renderPage = () => {
-        if (page === 'splash') {
-            return <SplashScreen />;
-        }
         if (!isAuthenticated) {
             switch (page) {
                 case 'login':
@@ -44,7 +68,8 @@ export default function App() {
                     return <AuthScreen setPage={setPage} onLogin={handleLogin} />;
             }
         }
-        return <MainAppNavigator onLogout={handleLogout} />;
+        // Pass the user object as a prop to the navigator
+        return <MainAppNavigator user={user} onLogout={handleLogout} />;
     };
 
     return (
@@ -53,6 +78,3 @@ export default function App() {
         </SafeAreaView>
     );
 }
-
-
-
