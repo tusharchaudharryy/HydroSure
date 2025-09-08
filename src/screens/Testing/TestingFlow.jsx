@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { styles, colors } from '../../styles/globalStyles';
 import { ResultItem } from '../../components/common/ResultItem';
-
+import PermissionsRequest from './PermissionRequest';
+import ImageCapture from './ImageCapture';
 // --- Sub-components for the testing flow ---
 
 const StepHeader = ({ title, onBack }) => (
@@ -38,70 +39,70 @@ const InstructionScreen = ({ onNext }) => (
     </View>
 );
 
-const PermissionsRequest = ({ onNext, onBack }) => {
-    const [cameraGranted, setCameraGranted] = useState(false);
-    const [locationGranted, setLocationGranted] = useState(false);
+    // const PermissionsRequest = ({ onNext, onBack }) => {
+    //     const [cameraGranted, setCameraGranted] = useState(false);
+    //     const [locationGranted, setLocationGranted] = useState(false);
+        
+    //     return (
+    //         <View>
+    //             <StepHeader title="Permissions" onBack={onBack} />
+    //             <View style={[styles.permissionCard, cameraGranted && { backgroundColor: colors.successLight }]}>
+    //                 <View>
+    //                     <Text style={styles.sectionTitle}>📷 Camera Access</Text>
+    //                     <Text style={styles.textSmall}>Needed to scan the test strip and chart.</Text>
+    //                 </View>
+    //                 {!cameraGranted && <TouchableOpacity onPress={() => setCameraGranted(true)} style={styles.allowButton}><Text style={styles.allowButtonText}>Allow</Text></TouchableOpacity>}
+    //                 {cameraGranted && <Text style={{ color: colors.success, fontWeight: 'bold' }}>Granted</Text>}
+    //             </View>
+    //             <View style={[styles.permissionCard, locationGranted && { backgroundColor: colors.successLight }]}>
+    //                 <View>
+    //                     <Text style={styles.sectionTitle}>📍 Location Access</Text>
+    //                     <Text style={styles.textSmall}>To tag your test results with your location.</Text>
+    //                 </View>
+    //                 {!locationGranted && <TouchableOpacity onPress={() => setLocationGranted(true)} style={styles.allowButton}><Text style={styles.allowButtonText}>Allow</Text></TouchableOpacity>}
+    //                 {locationGranted && <Text style={{ color: colors.success, fontWeight: 'bold' }}>Granted</Text>}
+    //             </View>
+    //             {(cameraGranted && locationGranted) &&
+    //                 <TouchableOpacity onPress={onNext} style={[styles.button, { marginTop: 32 }]}>
+    //                     <Text style={styles.buttonText}>Continue</Text>
+    //                 </TouchableOpacity>
+    //             }
+    //         </View>
+    //     );
+    // };
 
-    return (
-        <View>
-            <StepHeader title="Permissions" onBack={onBack} />
-            <View style={[styles.permissionCard, cameraGranted && { backgroundColor: colors.successLight }]}>
-                <View>
-                    <Text style={styles.sectionTitle}>📷 Camera Access</Text>
-                    <Text style={styles.textSmall}>Needed to scan the test strip and chart.</Text>
-                </View>
-                {!cameraGranted && <TouchableOpacity onPress={() => setCameraGranted(true)} style={styles.allowButton}><Text style={styles.allowButtonText}>Allow</Text></TouchableOpacity>}
-                {cameraGranted && <Text style={{ color: colors.success, fontWeight: 'bold' }}>Granted</Text>}
-            </View>
-            <View style={[styles.permissionCard, locationGranted && { backgroundColor: colors.successLight }]}>
-                <View>
-                    <Text style={styles.sectionTitle}>📍 Location Access</Text>
-                    <Text style={styles.textSmall}>To tag your test results with your location.</Text>
-                </View>
-                {!locationGranted && <TouchableOpacity onPress={() => setLocationGranted(true)} style={styles.allowButton}><Text style={styles.allowButtonText}>Allow</Text></TouchableOpacity>}
-                {locationGranted && <Text style={{ color: colors.success, fontWeight: 'bold' }}>Granted</Text>}
-            </View>
-            {(cameraGranted && locationGranted) &&
-                <TouchableOpacity onPress={onNext} style={[styles.button, { marginTop: 32 }]}>
-                    <Text style={styles.buttonText}>Continue</Text>
-                </TouchableOpacity>
-            }
-        </View>
-    );
-};
-
-const ImageCapture = ({ type, onNext, onBack }) => {
-    const [image, setImage] = useState(null);
-    return (
-        <View>
-            <StepHeader title={`Capture ${type}`} onBack={onBack} />
-            <View style={styles.cameraPlaceholder}>
-                {image ? (
-                    <View style={{ alignItems: 'center' }}>
-                        <Text style={{ fontSize: 64 }}>✅</Text>
-                        <Text>{type} Image Captured</Text>
-                    </View>
-                ) : (
-                    <Text style={{ fontSize: 48, color: '#9CA3AF' }}>📷</Text>
-                )}
-            </View>
-            {!image ? (
-                <TouchableOpacity onPress={() => setImage(true)} style={styles.button}>
-                    <Text style={styles.buttonText}>Take Picture</Text>
-                </TouchableOpacity>
-            ) : (
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
-                    <TouchableOpacity onPress={() => setImage(null)} style={[styles.button, styles.halfButton, { backgroundColor: '#E5E7EB' }]}>
-                        <Text style={[styles.buttonText, { color: '#1F2937' }]}>Retake</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={onNext} style={[styles.button, styles.halfButton, { backgroundColor: colors.accent }]}>
-                        <Text style={styles.buttonText}>Confirm</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
-        </View>
-    );
-};
+    // const ImageCapture = ({ type, onNext, onBack }) => {
+    //     const [image, setImage] = useState(null);
+    //     return (
+    //         <View>
+    //             <StepHeader title={`Capture ${type}`} onBack={onBack} />
+    //             <View style={styles.cameraPlaceholder}>
+    //                 {image ? (
+    //                     <View style={{ alignItems: 'center' }}>
+    //                         <Text style={{ fontSize: 64 }}>✅</Text>
+    //                         <Text>{type} Image Captured</Text>
+    //                     </View>
+    //                 ) : (
+    //                     <Text style={{ fontSize: 48, color: '#9CA3AF' }}>📷</Text>
+    //                 )}
+    //             </View>
+    //             {!image ? (
+    //                 <TouchableOpacity onPress={() => setImage(true)} style={styles.button}>
+    //                     <Text style={styles.buttonText}>Take Picture</Text>
+    //                 </TouchableOpacity>
+    //             ) : (
+    //                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
+    //                     <TouchableOpacity onPress={() => setImage(null)} style={[styles.button, styles.halfButton, { backgroundColor: '#E5E7EB' }]}>
+    //                         <Text style={[styles.buttonText, { color: '#1F2937' }]}>Retake</Text>
+    //                     </TouchableOpacity>
+    //                     <TouchableOpacity onPress={onNext} style={[styles.button, styles.halfButton, { backgroundColor: colors.accent }]}>
+    //                         <Text style={styles.buttonText}>Confirm</Text>
+    //                     </TouchableOpacity>
+    //                 </View>
+    //             )}
+    //         </View>
+    //     );
+    // };
 
 const ProcessingScreen = ({ onComplete }) => {
     useEffect(() => {
