@@ -9,13 +9,20 @@ import { SplashScreen } from './src/screens/SplashScreen';
 import { AuthScreen } from './src/screens/Auth/AuthScreen';
 import { MainAppNavigator } from './src/navigation/MainAppNavigator';
 
+
 export default function App() {
+    const [showSplash, setShowSplash] = useState(true); // For splash screen
     const [page, setPage] = useState('splash');
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [isLoading, setIsLoading] = useState(true); // To handle initial auth check
     const [user, setUser] = useState(null); // <-- Add state to hold the user object
 
     useEffect(() => {
+
+        const splashTimer = setTimeout(() => {
+            setShowSplash(false);
+        }, 5000); 
+
         // onAuthStateChanged returns an unsubscribe function
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser); // <-- Store the full user object from Firebase
@@ -31,8 +38,10 @@ export default function App() {
             setPage(currentUser ? 'main' : 'login');
         });
 
-        // Cleanup subscription on unmount
-        return unsubscribe;
+        return () => {
+            clearTimeout(splashTimer);
+            unsubscribe();
+        };
     }, []);
 
     const handleLogin = () => {
@@ -48,13 +57,22 @@ export default function App() {
         // The onAuthStateChanged listener will handle setting isAuthenticated to false
     }
 
+    // if (isLoading) {
+    //     // You can show a loading spinner or splash screen while checking auth
+    //     return (
+    //         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+    //             <ActivityIndicator size="large" />
+    //         </View>
+    //     );
+    // }
+    // ✅ Step 1: Show SplashScreen first
+    if (showSplash) {
+        return <SplashScreen />;
+    }
+
+    // ✅ Step 2: If still loading auth after splash, you can fallback to splash or loader
     if (isLoading) {
-        // You can show a loading spinner or splash screen while checking auth
-        return (
-            <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-                <ActivityIndicator size="large" />
-            </View>
-        );
+        return <SplashScreen />;
     }
 
     const renderPage = () => {
