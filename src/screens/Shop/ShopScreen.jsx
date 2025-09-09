@@ -1,12 +1,10 @@
-// FILE: varify-app/src/screens/Shop/ShopScreen.jsx
-
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '../../styles/globalStyles';
 
 const ShopScreen = () => (
     <View>
-        <Text style={styles.pageTitle}>Shop Varify Products</Text>
+        <Text style={styles.pageTitle}>Shop HydroSure Products</Text>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
             {['16-in-1 Test Kit', 'Bacteria Test Kit', 'Refill Strips', 'Water Filter'].map(item => (
                 <View key={item} style={styles.shopItem}>

@@ -1,5 +1,3 @@
-// FILE: varify-app/src/screens/SplashScreen.jsx
-
 import React from 'react';
 import { View, Text, Image } from 'react-native';
 import { styles } from '../styles/globalStyles';
