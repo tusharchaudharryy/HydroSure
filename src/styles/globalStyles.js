@@ -20,15 +20,16 @@ export const colors = {
   successLight: '#D1FAE5',
   info: '#1D4ED8',
   infoLight: '#EFF6FF',
+  logo: '#1c4b5b',
 };
 
 export const styles = StyleSheet.create({
     safeArea: { flex: 1, backgroundColor: colors.background },
     container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 16 },
     // Splash
-    splashContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary },
+    splashContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.logo },
     splashTitle: { fontSize: 48, fontWeight: 'bold', marginTop: 16, color: colors.white },
-    splashSubtitle: { fontSize: 18, marginTop: 8, color: colors.white },
+    splashSubtitle: { fontSize: 18, marginTop: 30, color: colors.white },
     // Auth
     authCard: { width: '100%', backgroundColor: colors.white, padding: 32, borderRadius: 16, elevation: 5, shadowColor: colors.black, shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4 },
     authTitle: { fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 8, color: colors.text },

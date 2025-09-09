@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { styles } from '../../styles/globalStyles';
+import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { styles, colors } from '../../styles/globalStyles';
 import { auth } from '../../firebase'; // Import the auth object
 
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
@@ -43,7 +43,8 @@ export const AuthScreen = ({ setPage, onLogin, isSignup = false }) => {
     return (
         <View style={[styles.container, { backgroundColor: '#F3F4F6' }]}>
             <View style={styles.authCard}>
-                <Text style={{ fontSize: 64, color: '#2563EB', textAlign: 'center' }}>🛡️</Text>
+                {/* <Image source={require('../../../assets/logo_transparent.png')} style={{width: 300, height: 300}} /> */}
+                
                 <Text style={styles.authTitle}>{isSignup ? 'Create Account' : 'Welcome Back!'}</Text>
                 <Text style={styles.authSubtitle}>{isSignup ? 'Join us to monitor your water quality.' : 'Sign in to continue.'}</Text>
 
@@ -54,6 +55,7 @@ export const AuthScreen = ({ setPage, onLogin, isSignup = false }) => {
                             style={styles.input}
                             value={fullName}
                             onChangeText={setFullName}
+                            placeholderTextColor = {colors.gray}
                         />
                     )}
                     <TextInput
@@ -63,6 +65,7 @@ export const AuthScreen = ({ setPage, onLogin, isSignup = false }) => {
                         value={email}
                         onChangeText={setEmail}
                         autoCapitalize="none"
+                        placeholderTextColor = {colors.gray}
                     />
                     <TextInput
                         placeholder="Password"
@@ -70,6 +73,7 @@ export const AuthScreen = ({ setPage, onLogin, isSignup = false }) => {
                         secureTextEntry
                         value={password}
                         onChangeText={setPassword}
+                        placeholderTextColor = {colors.gray}
                     />
 
                     <TouchableOpacity onPress={isSignup ? handleSignUp : handleLogin} style={styles.button}>
