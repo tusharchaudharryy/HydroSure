@@ -1,5 +1,3 @@
-// FILE: varify-app/src/components/layout/BottomNavBar.jsx
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors } from '../../styles/globalStyles';

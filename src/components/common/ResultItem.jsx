@@ -1,5 +1,3 @@
-// FILE: varify-app/src/components/common/ResultItem.jsx
-
 import React from 'react';
 import { View, Text } from 'react-native';
 import { styles } from '../../styles/globalStyles';

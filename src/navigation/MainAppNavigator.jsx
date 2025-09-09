@@ -1,5 +1,3 @@
-// FILE: varify-app/src/navigation/MainAppNavigator.jsx
-
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
 
@@ -28,7 +26,7 @@ export const MainAppNavigator = ({ onLogout }) => {
             <View style={styles.header}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Text style={{ fontSize: 28, color: '#2563EB', marginRight: 8 }}>🛡️</Text>
-                    <Text style={styles.headerTitle}>Varify</Text>
+                    <Text style={styles.headerTitle}>HydroSure</Text>
                 </View>
                 <TouchableOpacity onPress={onLogout} style={styles.logoutButton}>
                     <Text style={{ fontSize: 20 }}>🚪</Text>

@@ -1,5 +1,3 @@
-// FILE: varify-app/src/styles/globalStyles.js
-
 import { StyleSheet, Dimensions } from 'react-native';
 
 export const colors = {
