@@ -1,5 +1,5 @@
-fastapi
-uvicorn
-openai
-pydantic
-python-dotenv
+langchain
+langgraph
+langchain-google-genai
+numpy
+Pillow
