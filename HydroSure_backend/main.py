@@ -23,12 +23,12 @@ def analyze_strip(data: ImageRequest):
         messages=[
             {
                 "role": "system",
-                "content": "You are an assistant that analyzes water test strips against a chart and outputs JSON only."
+                "content": "You are an expert in Chemistry, We have conducted a water test where we have dipped litmus paper and this litmus paper shows some colours, a colour chart is also attached and you have to do colour matching and find out the content of harmful minerals in the water sample can u output json for estimated content of various minerals and one field of json should also be the report given by u which would tell which minerals are high and out of range"
             },
             {
                 "role": "user",
                 "content": [
-                    {"type": "text", "text": "Compare strip against chart and return water quality results in JSON format."},
+                    {"type": "text", "text": "Compare strip against chart and return water quality results in JSON format only."},
                     {"type": "image_url", "image_url": {"url": chart_img}},
                     {"type": "image_url", "image_url": {"url": strip_img}}
                 ]
