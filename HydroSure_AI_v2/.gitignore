@@ -1,0 +1,13 @@
+
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.idea/
+
+# Data (if they get large)
+# data/processed/
+
+# OS
+.DS_Store
