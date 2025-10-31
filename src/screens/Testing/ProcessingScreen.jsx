@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { styles, colors } from '../../styles/globalStyles';
 
-const API_URL = 'http://103.118.50.252:8000/analyze'; // <-- REPLACE WITH YOUR IP
+const API_URL = 'http://localhost:8000/analyze'; // <-- REPLACE WITH YOUR IP
 // ... // <-- REPLACE WITH YOUR IP
 
 const ProcessingScreen = ({ chartImage, stripImage, onComplete, onBack }) => {
