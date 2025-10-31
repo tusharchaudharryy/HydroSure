@@ -1,30 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'; // <-- Import Alert
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { styles, colors } from '../../styles/globalStyles';
 
 const ImageCapture = ({ type, onNext, onBack }) => {
   const [image, setImage] = useState(null);
+  const [imageAsset, setImageAsset] = useState(null);
 
-  // Reset image whenever the capture type changes
   useEffect(() => {
     setImage(null);
+    setImageAsset(null);
   }, [type]);
 
+  // --- REVISED: More robust handleResponse function ---
+  const handleResponse = (response) => {
+    if (response.didCancel) {
+      console.log('User cancelled image picker');
+      return; // Do nothing
+    }
+
+    if (response.errorCode) {
+      console.log('ImagePicker Error: ', response.errorMessage);
+      Alert.alert('Image Error', response.errorMessage); // Show error to user
+      return;
+    }
+
+    // Check if assets exist and are not empty
+    if (response.assets && response.assets.length > 0) {
+      const asset = response.assets[0];
+      setImage(asset.uri);
+      setImageAsset(asset);
+    } else {
+      // This handles unexpected cases where no asset is returned
+      Alert.alert('Error', 'Could not retrieve the image. Please try again.');
+    }
+  };
+  // --- End of revision ---
+
   const openCamera = async () => {
-    launchCamera({ mediaType: 'photo', quality: 1 }, (response) => {
-      if (!response.didCancel && !response.errorCode) {
-        setImage(response.assets[0].uri);
-      }
-    });
+    // Note: Ensure permissions were already granted by InstructionScreen
+    launchCamera({ mediaType: 'photo', quality: 1 }, handleResponse);
   };
 
   const openGallery = async () => {
-    launchImageLibrary({ mediaType: 'photo', quality: 1 }, (response) => {
-      if (!response.didCancel && !response.errorCode) {
-        setImage(response.assets[0].uri);
-      }
-    });
+    launchImageLibrary({ mediaType: 'photo', quality: 1 }, handleResponse);
   };
 
   return (
@@ -51,19 +70,28 @@ const ImageCapture = ({ type, onNext, onBack }) => {
       ) : (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
           <TouchableOpacity
-            onPress={() => setImage(null)}
+            onPress={() => {
+              setImage(null);
+              setImageAsset(null);
+            }}
             style={[styles.button, styles.halfButton, { backgroundColor: '#E5E7EB' }]}
           >
             <Text style={[styles.buttonText, { color: '#1F2937' }]}>Retake</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={onNext}
+            // Pass the full asset up (this logic is correct)
+            onPress={() => onNext(imageAsset)} 
             style={[styles.button, styles.halfButton, { backgroundColor: colors.accent }]}
           >
             <Text style={styles.buttonText}>Confirm</Text>
           </TouchableOpacity>
         </View>
       )}
+
+      {/* Added the Back button for better navigation */}
+      <TouchableOpacity onPress={onBack} style={[styles.button, { marginTop: 12, backgroundColor: 'transparent' }]}>
+        <Text style={[styles.buttonText, { color: colors.text }]}>Back</Text>
+      </TouchableOpacity>
     </View>
   );
 };
