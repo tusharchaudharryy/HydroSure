@@ -2,7 +2,9 @@
 import numpy as np
 import cv2
 import base64
-from skimage.color import rgb2lab, hex2rgb # <-- Add hex2rgb
+import re
+from typing import List
+from skimage.color import rgb2lab
 
 def b64_to_cv_image(b64_string: str) -> np.ndarray:
     """
@@ -23,26 +25,45 @@ def b64_to_cv_image(b64_string: str) -> np.ndarray:
     return image
 
 def get_hex_from_bgr(bgr_color: List[int]) -> str:
-    """Converts a BGR color list to a web-friendly HEX string."""
+    """
+    Converts a BGR color list to a web-friendly HEX string.
+    """
     # OpenCV uses BGR, we want RGB for HEX display
     b, g, r = [int(c) for c in bgr_color]
     return f'#{r:02x}{g:02x}{b:02x}'
 
-# --- ADD THIS NEW FUNCTION ---
-def hex_to_lab(hex_color: str) -> list[float]:
+def hex_to_rgb(hex_color: str) -> np.ndarray:
+    """
+    Converts a HEX color string (e.g., "#E3BBA4") to an RGB NumPy array in [0, 1] range.
+    """
+    # Clean and validate HEX string
+    hex_color = hex_color.strip().lstrip('#')
+    if not re.match(r'^[0-9A-Fa-f]{6}$', hex_color):
+        # Raise an explicit error so the node can catch it
+        raise ValueError(f"Invalid HEX color format: {hex_color}")
+
+    # Convert HEX components to float [0.0, 1.0]
+    r = int(hex_color[0:2], 16) / 255.0
+    g = int(hex_color[2:4], 16) / 255.0
+    b = int(hex_color[4:6], 16) / 255.0
+    
+    # Return as a NumPy array for skimage.color
+    return np.array([r, g, b], dtype=np.float64)
+
+def hex_to_lab(hex_color: str) -> List[float]:
     """
     Converts a HEX color string (e.g., "#E3BBA4") to a CIELAB color list.
     """
+    # This is the indented block that was missing
     try:
-        # 1. Convert HEX string to an RGB NumPy array (e.g., [227, 187, 164])
-        # hex2rgb returns values from 0-255 as uint8
-        rgb_array = hex2rgb(hex_color)
+        # 1. Convert HEX to RGB [0, 1] range
+        rgb = hex_to_rgb(hex_color)
         
-        # 2. Convert RGB array to LAB
-        # rgb2lab expects a 3D array (height, width, channels)
-        lab_color = rgb2lab(rgb_array.reshape(1, 1, 3))[0][0]
+        # 2. Reshape to 3D array (1, 1, 3) for rgb2lab and convert to LAB
+        lab_color = rgb2lab(rgb.reshape(1, 1, 3))[0][0]
         
         return list(lab_color)
     except Exception as e:
+        # If hex_to_rgb failed, or lab conversion failed, return black as safe failure
         print(f"Error converting HEX {hex_color} to LAB: {e}")
-        return [0.0, 0.0, 0.0] # Return black on failure
+        return [0.0, 0.0, 0.0]
