@@ -2,7 +2,7 @@
 import numpy as np
 import cv2
 import base64
-from typing import List   # ✅ required for type hint in get_hex_from_bgr
+from skimage.color import rgb2lab, hex2rgb # <-- Add hex2rgb
 
 def b64_to_cv_image(b64_string: str) -> np.ndarray:
     """
@@ -27,3 +27,22 @@ def get_hex_from_bgr(bgr_color: List[int]) -> str:
     # OpenCV uses BGR, we want RGB for HEX display
     b, g, r = [int(c) for c in bgr_color]
     return f'#{r:02x}{g:02x}{b:02x}'
+
+# --- ADD THIS NEW FUNCTION ---
+def hex_to_lab(hex_color: str) -> list[float]:
+    """
+    Converts a HEX color string (e.g., "#E3BBA4") to a CIELAB color list.
+    """
+    try:
+        # 1. Convert HEX string to an RGB NumPy array (e.g., [227, 187, 164])
+        # hex2rgb returns values from 0-255 as uint8
+        rgb_array = hex2rgb(hex_color)
+        
+        # 2. Convert RGB array to LAB
+        # rgb2lab expects a 3D array (height, width, channels)
+        lab_color = rgb2lab(rgb_array.reshape(1, 1, 3))[0][0]
+        
+        return list(lab_color)
+    except Exception as e:
+        print(f"Error converting HEX {hex_color} to LAB: {e}")
+        return [0.0, 0.0, 0.0] # Return black on failure

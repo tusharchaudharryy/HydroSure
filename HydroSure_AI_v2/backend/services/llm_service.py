@@ -11,9 +11,10 @@ except Exception as e:
     logging.error(f"Failed to initialize OpenAI client: {e}")
     client = None
 
-def get_interpretation_summary(results: List[Dict[str, Any]]) -> Optional[str]:
+def get_interpretation_summary(results: List[Dict[str, Any]], location_context: str = "") -> Optional[str]:
     """
     Sends the final structured results to an LLM for a human-readable summary.
+    Now accepts optional location context.
     """
     if not client:
         logging.error("LLM Service: OpenAI client not initialized. Skipping interpretation.")
@@ -21,14 +22,15 @@ def get_interpretation_summary(results: List[Dict[str, Any]]) -> Optional[str]:
 
     logging.info("LLM Service: Starting result interpretation...")
     
-    # Format the results into a clean, text-based table/list for the LLM
     result_text = "\n".join([
         f"- {r.get('parameter', 'N/A')}: {r.get('matched_value', 'N/A')} {r.get('unit', '')}"
         for r in results
     ])
     
+    # Create the final prompt, including the location context if it exists
     prompt = (
         "You are an expert water quality analyst providing a summary for a home user. "
+        f"{location_context} " # Add location context (will be empty string if no location)
         "Review the following test results and provide a concise, friendly, 2-3 sentence summary "
         "of the water quality. Highlight 1-2 major points (good or bad). "
         "Do not use highly technical language or mention confidence/error scores. "
@@ -39,7 +41,7 @@ def get_interpretation_summary(results: List[Dict[str, Any]]) -> Optional[str]:
 
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo", # Cheaper model for simple text summary
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "user", "content": prompt}
             ],

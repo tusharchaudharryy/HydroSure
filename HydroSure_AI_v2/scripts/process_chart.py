@@ -84,17 +84,17 @@ def save_to_mongodb(chart_data: List[Dict[str, Any]]):
 
     # Check for DB connection (real save)
     db_conn = get_db_connection()
-    if db_conn:
+    if db_conn is not None:
         try:
             collection = db_conn["chart_reference"]
             collection.delete_many({})
             collection.insert_many(chart_data)
-            logging.info("🎉 Successfully saved new chart reference to MongoDB!")
+            logging.info(" Successfully saved new chart reference to MongoDB!")
             return
         except Exception as e:
             logging.error(f"Failed to save data to MongoDB: {e}. Falling back to print simulation.")
 
-    logging.info("--- 🚀 SIMULATING DATABASE SAVE (DB Connection Failed) 🚀 ---")
+    logging.info(" SIMULATING DATABASE SAVE (DB Connection Failed)")
     logging.info(f"Would save {len(chart_data)} documents to MongoDB.")
     
     # Print the data
@@ -106,7 +106,7 @@ def save_to_mongodb(chart_data: List[Dict[str, Any]]):
     try:
         pretty_data = json.dumps(chart_data, indent=2, default=convert)
         print("\n" + pretty_data + "\n")
-        logging.info("🎉 Successfully generated chart reference data!")
+        logging.info(" Successfully generated chart reference data!")
     except Exception as e:
          logging.error(f"Error during JSON serialization for printing: {e}")
 

@@ -2,9 +2,9 @@
 import operator
 from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, END
-from backend.api.schemas import MatchResult
+from backend.api.schemas import MatchResult # Keep this for node output
 
-# --- Define the State (REVISED) ---
+# --- Define the State (UPDATED) ---
 class AnalysisState(TypedDict):
     """
     The state passed between the LangGraph nodes.
@@ -12,17 +12,20 @@ class AnalysisState(TypedDict):
     # Input
     strip_image_b64: str
     chart_image_b64: str 
+    latitude: Optional[float]
+    longitude: Optional[float]
     
-    # We no longer need chart_reference in the state
+    # --- NEW: ID and Timestamp ---
+    strip_id: str
+    timestamp: str
     
-    # We no longer need segmented_pads in the state
-    
-    # We use validation_status as a simple "success" flag from the LLM
+    # Internal State
     validation_status: str 
     
     # Final Output
     match_results: Optional[List[MatchResult]]
     ai_summary: Optional[str]
+    location_summary: Optional[str]
     error_message: Optional[str]
 
 
@@ -36,14 +39,15 @@ def decide_next_step(state: AnalysisState) -> str:
     else:
         return END # Fallback
 
-# --- Build the Graph (REVISED) ---
+# --- Build the Graph (UPDATED) ---
 def build_analysis_graph():
-    """Defines and compiles the new, simpler LangGraph workflow."""
+    """Defines and compiles the LangGraph workflow, now with a save step."""
     
     # Import nodes here to break circular dependency
     from .nodes import (
         llm_analysis_node,
-        interpret_results_node
+        interpret_results_node,
+        save_report_node  # <-- NEW NODE
     )
     
     workflow = StateGraph(AnalysisState)
@@ -53,6 +57,9 @@ def build_analysis_graph():
     
     # 2. LLM-T: Interpret the results
     workflow.add_node("interpret_results", interpret_results_node)
+    
+    # 3. Save: Save report to MongoDB
+    workflow.add_node("save_report", save_report_node) # <-- NEW NODE
     
     # --- Define Edges ---
     
@@ -69,8 +76,11 @@ def build_analysis_graph():
         }
     )
     
+    # Flow after interpretation
+    workflow.add_edge("interpret_results", "save_report") # <-- UPDATED EDGE
+    
     # Final Output:
-    workflow.add_edge("interpret_results", END)
+    workflow.add_edge("save_report", END) # <-- NEW FINAL EDGE
     
     return workflow.compile()
 
