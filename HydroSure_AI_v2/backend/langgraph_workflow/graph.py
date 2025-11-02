@@ -4,7 +4,7 @@ from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, END
 from backend.api.schemas import MatchResult
 
-# --- Define the State (UPDATED) ---
+# --- Define the State (Final) ---
 class AnalysisState(TypedDict):
     """
     The state passed between the LangGraph nodes.
@@ -20,7 +20,7 @@ class AnalysisState(TypedDict):
     # Internal State
     validation_status: str 
     
-    # --- NEW: Raw LLM output for the confidence node ---
+    # NEW: Raw LLM output for the confidence node
     llm_raw_output: Optional[List[Dict[str, Any]]] 
 
     # Final Output
@@ -30,19 +30,21 @@ class AnalysisState(TypedDict):
     error_message: Optional[str]
 
 
-# --- Conditional Edges (Unchanged) ---
+# --- Conditional Edges ---
 def decide_next_step(state: AnalysisState) -> str:
+    """Decides whether to proceed to summary or stop."""
     if state.get("error_message"):
-        return END
+        return END # Stop if LLM analysis failed
     if state.get("validation_status") == "ALL_VALID":
-        return "calculate_confidence"
+        return "calculate_confidence" # Proceed to confidence calculation
     else:
-        return END
+        return END # Fallback
 
-# --- Build the Graph (Unchanged from last step) ---
+# --- Build the Graph (Final) ---
 def build_analysis_graph():
-    """Defines and compiles the LangGraph workflow, now with a confidence step."""
+    """Defines and compiles the LangGraph workflow with confidence scoring."""
     
+    # Import nodes here to break circular dependency
     from .nodes import (
         llm_analysis_node,
         calculate_confidence_node,
@@ -52,13 +54,24 @@ def build_analysis_graph():
     
     workflow = StateGraph(AnalysisState)
 
+    # 1. Start: Full LLM Analysis
     workflow.add_node("llm_analysis", llm_analysis_node)
+    
+    # 2. NEW: Calculate Confidence
     workflow.add_node("calculate_confidence", calculate_confidence_node)
+    
+    # 3. LLM-T: Interpret the results
     workflow.add_node("interpret_results", interpret_results_node)
+    
+    # 4. Save: Save report to MongoDB
     workflow.add_node("save_report", save_report_node)
     
+    # --- Define Edges ---
+    
+    # Entry Point:
     workflow.set_entry_point("llm_analysis")
     
+    # Conditional edge based on LLM analysis success
     workflow.add_conditional_edges(
         "llm_analysis",
         decide_next_step,
@@ -68,10 +81,12 @@ def build_analysis_graph():
         }
     )
     
+    # New linear flow
     workflow.add_edge("calculate_confidence", "interpret_results")
     workflow.add_edge("interpret_results", "save_report")
     workflow.add_edge("save_report", END)
     
     return workflow.compile()
 
+# Global graph instance (to be used by FastAPI)
 analysis_graph = build_analysis_graph()

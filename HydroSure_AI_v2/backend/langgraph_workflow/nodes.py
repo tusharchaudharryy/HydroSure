@@ -9,6 +9,8 @@ from backend.services.llm_service import get_interpretation_summary
 from backend.api.schemas import MatchResult
 from backend.models.db_models import AnalysisReport, MatchResultForDB
 from backend.utils.db import get_db_connection
+
+# --- Imports for Confidence Calculation ---
 from backend.utils.image_utils import hex_to_lab
 from backend.services.match_service import calculate_delta_e
 
@@ -39,11 +41,11 @@ MANUAL_PARAMETER_MAP = [
     {"name": "TOTAL ALKALINITY", "values": ["0", "40", "80", "120", "180", "240"]}
 ]
 
-# --- Node 1: The "Super Agent" (UPDATED) ---
+# --- Node 1: The "Super Agent" (AGGRESSIVE PROMPT) ---
 def llm_analysis_node(state: AnalysisState) -> Dict[str, Any]:
     """
     Uses GPT-4o to perform segmentation and matching.
-    It now returns the RAW JSON output from the LLM.
+    This new prompt forces the LLM to separate its reasoning steps.
     """
     logging.info("Node: Starting full analysis with GPT-4o...")
     
@@ -55,30 +57,28 @@ def llm_analysis_node(state: AnalysisState) -> Dict[str, Any]:
     
     param_list_str = "\n".join([f"Row {i} (Parameter: {p['name']}): Values are {', '.join(p['values'])}" for i, p in enumerate(MANUAL_PARAMETER_MAP)])
     
+    # --- PROMPT UPDATED (V3) ---
     prompt = f"""
-    You are a highly accurate computer vision assistant for water quality testing.
-    You will be given two images:
-    1. A reference color chart (Image 1).
-    2. A dipped test strip (Image 2).
+    You are a high-accuracy computer vision assistant. You will be given a reference chart (Image 1) and a test strip (Image 2).
+    Perform the following tasks IN ORDER for all 16 parameters:
     
-    The test strip has 16 pads, corresponding top-to-bottom to the 16 rows on the chart.
+    TASK 1: For each pad on the test strip (Image 2) from top to bottom, determine its dominant HEX color.
+    TASK 2: For each pad, find the visually closest matching color swatch on the *corresponding row* of the reference chart (Image 1).
+    TASK 3: Return the "value" (e.g., "7.5", "100") of that matched chart swatch.
+    TASK 4: Return the HEX code of that matched chart swatch from TASK 2.
+
     The parameters and their corresponding values are:
     {param_list_str}
     
-    Your task is to:
-    1. For each of the 16 pads on the test strip (Image 2), find the closest matching value from the chart (Image 1).
-    2. Provide the HEX code of the color you detected on the STRIP.
-    3. Provide the HEX code of the *matched swatch* on the CHART.
-    
     Return your response ONLY as a JSON object with a single key "results".
-    The "results" key should contain a list of 16 JSON objects, one for each parameter, in order.
+    The "results" key must be a list of 16 JSON objects.
     
-    Each object must have the following required format:
+    Each object must have the following required format. CRITICALLY: `strip_hex` and `chart_hex` MUST be two different values unless they are a perfect match.
     {{
       "parameter": "Parameter Name",
-      "matched_value": "The closest value from the chart",
-      "strip_hex": "The HEX code of the color detected on the STRIP (Image 2)",
-      "chart_hex": "The HEX code of the MATCHED SWATCH on the CHART (Image 1)"
+      "matched_value": "The value from the chart you matched (TASK 3)",
+      "strip_hex": "The HEX code of the color on the STRIP (TASK 1)",
+      "chart_hex": "The HEX code of the *matched swatch* on the CHART (TASK 4)"
     }}
     
     Do not include any other text, explanations, or markdown in your response.
@@ -108,7 +108,6 @@ def llm_analysis_node(state: AnalysisState) -> Dict[str, Any]:
         if not llm_results_list or len(llm_results_list) != 16:
              return {"error_message": f"LLM analysis failed. Expected 16 results, got {len(llm_results_list)}."}
 
-        # --- THIS IS THE CHANGE ---
         # Pass the raw list to the next node
         return {"llm_raw_output": llm_results_list, "validation_status": "ALL_VALID"}
 
@@ -135,9 +134,18 @@ def calculate_confidence_node(state: AnalysisState) -> Dict[str, Any]:
             strip_hex = res.get("strip_hex")
             chart_hex = res.get("chart_hex")
             
+            # --- NEW: Verbose Logging ---
+            logging.debug(f"Processing {param_name}: StripHEX={strip_hex}, ChartHEX={chart_hex}")
+
             if not strip_hex or not chart_hex:
-                logging.warning(f"Missing HEX value for {param_name}. Skipping confidence score.")
-                delta_e_score = 999.0 # High error
+                logging.warning(f"Missing HEX value for {param_name}. Setting score to 999.")
+                delta_e_score = 999.0
+            
+            # --- NEW: Check for LLM "cheating" ---
+            elif strip_hex == chart_hex:
+                logging.warning(f"LLM returned identical HEX codes for {param_name}. Setting score to 998 (LLM error).")
+                delta_e_score = 998.0 # Use a special code for this error
+                
             else:
                 # 1. Convert HEX codes to LAB
                 strip_lab = hex_to_lab(strip_hex)
@@ -145,6 +153,7 @@ def calculate_confidence_node(state: AnalysisState) -> Dict[str, Any]:
                 
                 # 2. Calculate Delta E
                 delta_e_score = calculate_delta_e(strip_lab, chart_lab)
+                logging.info(f"Successfully calculated Delta E for {param_name}: {delta_e_score:.2f}")
             
             unit = "ppb" if param_name in ["LEAD", "MANGANESE", "MERCURY"] else "ppm"
 
@@ -161,7 +170,6 @@ def calculate_confidence_node(state: AnalysisState) -> Dict[str, Any]:
             
         except Exception as e:
             logging.error(f"Failed to calculate Delta E for {param_name}: {e}")
-            # Add a failure entry
             match_results.append(
                 MatchResult(
                     parameter=param_name or "Unknown",
@@ -173,9 +181,7 @@ def calculate_confidence_node(state: AnalysisState) -> Dict[str, Any]:
             )
     
     return {"match_results": match_results}
-
-
-# --- Node 3: LLM Interpretation (Unchanged) ---
+# --- Node 3: LLM Interpretation (Final) ---
 def interpret_results_node(state: AnalysisState) -> Dict[str, Any]:
     """
     Uses LLM to generate a human-readable summary, now including location context.
@@ -205,7 +211,7 @@ def interpret_results_node(state: AnalysisState) -> Dict[str, Any]:
         logging.error(f"LLM interpretation failed: {e}")
         return {"ai_summary": "Summary generation failed.", "location_summary": location_summary}
 
-# --- Node 4: Save Report to MongoDB (Unchanged) ---
+# --- Node 4: Save Report to MongoDB (Final) ---
 def save_report_node(state: AnalysisState) -> Dict[str, Any]:
     """
     Saves the final, successful analysis report to the MongoDB 'analysis_reports' collection.
