@@ -44,7 +44,7 @@ export const styles = StyleSheet.create({
     // Main Content
     mainContent: { padding: 16, paddingBottom: 80 },
     pageTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: colors.text },
-    card: { padding: 16, borderRadius: 8, marginBottom: 16 },
+    //card: { padding: 16, borderRadius: 8, marginBottom: 16 },
     cardTitle: { fontWeight: 'bold', marginBottom: 4 },
     textSmall: { fontSize: 14, color: colors.gray },
     sectionTitle: { fontWeight: 'bold', marginBottom: 8, fontSize: 16, color: colors.text },
@@ -68,5 +68,74 @@ export const styles = StyleSheet.create({
     cameraPlaceholder: { height: Dimensions.get('window').width - 32, width: '100%', borderWidth: 2, borderColor: colors.border, borderStyle: 'dashed', borderRadius: 8, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background, marginBottom: 16 },
     halfButton: { width: '48%' },
     assessmentCard: { backgroundColor: colors.infoLight, padding: 16, borderRadius: 8, marginVertical: 16 },
+    header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+
+  logo: {
+    width: 500,
+    height: 500,
+    resizeMode: 'contain',
+    marginBottom: 24, // add more space below the logo
+    alignSelf: 'center', // keep it horizontally centered
+
+
+  },
+  card: {
+    width: "85%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    alignItems: "center",
+    paddingTop: 40,   // add some top padding so the logo sits lower overall
+    paddingBottom: 30,
+  },
+
+
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#007C91', // dark teal
+    letterSpacing: 0.5,
+  },
+
+  logoutButton: {
+    padding: 6,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#F8FCFF",
+    justifyContent: "center",
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
+  },
+
 });
 

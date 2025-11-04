@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, ActivityIndicator, View } from 'react-native';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './src/firebase'; // Import auth from your firebase config
-
+import { NavigationContainer } from "@react-navigation/native";
 
 import { styles } from './src/styles/globalStyles';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { AuthScreen } from './src/screens/Auth/AuthScreen';
 import { MainAppNavigator } from './src/navigation/MainAppNavigator';
-
 
 export default function App() {
     const [showSplash, setShowSplash] = useState(true); // For splash screen
@@ -65,12 +64,12 @@ export default function App() {
     //         </View>
     //     );
     // }
-    // ✅ Step 1: Show SplashScreen first
+    // Step 1: Show SplashScreen first
     if (showSplash) {
         return <SplashScreen />;
     }
 
-    // ✅ Step 2: If still loading auth after splash, you can fallback to splash or loader
+    // Step 2: If still loading auth after splash, you can fallback to splash or loader
     if (isLoading) {
         return <SplashScreen />;
     }
@@ -87,7 +86,12 @@ export default function App() {
             }
         }
         // Pass the user object as a prop to the navigator
-        return <MainAppNavigator user={user} onLogout={handleLogout} />;
+
+        return (
+            <NavigationContainer>
+                <MainAppNavigator user={user} onLogout={handleLogout} />
+            </NavigationContainer>
+        );
     };
 
     return (

@@ -4,11 +4,11 @@ import { View, Text, ActivityIndicator, Alert, TouchableOpacity } from 'react-na
 // --- ADD Geolocation ---
 import Geolocation from '@react-native-community/geolocation';
 import { styles, colors } from '../../styles/globalStyles';
-import * as logging from 'expo-logging'; // Or your preferred logging
+//import * as logging from 'expo-logging'; // Or your preferred logging
 
 // --- CRITICAL NOTE ---
 // You must use your computer's local network IP address, not localhost.
-const API_URL = 'http://172.22.0.58:8000/analyze'; // <-- REPLACE WITH YOUR IP
+const API_URL = 'localhost'; // <-- REPLACE WITH YOUR IP
 
 // --- NEW Helper Function to get location ---
 const getCurrentLocation = () => {
