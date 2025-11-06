@@ -1,23 +1,3 @@
-// import React from 'react';
-// import { View, Text } from 'react-native';
-// import { styles } from '../../styles/globalStyles';
-
-// const FAQScreen = () => (
-//     <View>
-//         <Text style={styles.pageTitle}>Frequently Asked Questions</Text>
-//         <View style={{ marginVertical: 8 }}>
-//             <Text style={styles.sectionTitle}>How accurate are the tests?</Text>
-//             <Text style={styles.textSmall}>Our tests are calibrated to provide highly accurate readings for home use. For certified results, please consult a professional lab.</Text>
-//         </View>
-//         <View style={{ marginVertical: 8 }}>
-//             <Text style={styles.sectionTitle}>How often should I test my water?</Text>
-//             <Text style={styles.textSmall}>We recommend testing your water every 3-6 months, or if you notice any change in taste, smell, or appearance.</Text>
-//         </View>
-//     </View>
-// );
-
-// export default FAQScreen;
-
 import React, { useState } from 'react';
 import {
   View,
@@ -26,11 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView, // Ensures content doesn't overlap with phone notches/status bar
+  SafeAreaView, 
 } from 'react-native';
 
-// --- Data from your second example ---
-// This is kept outside the component so it doesn't get recreated on every render
 const faqs = [
   {
     category: 'Getting Started',
@@ -236,7 +214,7 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#007AFF', // A blue "primary" color
+    color: '#007B83',
     marginBottom: 12,
   },
   noResultsText: {
@@ -270,7 +248,7 @@ const styles = StyleSheet.create({
   accordionIcon: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#007AFF',
+    color: '#007B83',
   },
   accordionContent: {
     paddingHorizontal: 14,
