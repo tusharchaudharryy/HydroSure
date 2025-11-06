@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   accordionAnswer: {
     fontSize: 15,
     color: '#555',
-    lineHeight: 22, // Improves readability
+    lineHeight: 22, 
   },
 });
 

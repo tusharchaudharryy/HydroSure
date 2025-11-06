@@ -378,21 +378,21 @@ const fetchDashboardData = () => {
             source: "WaterSafe.org",
             // Using a placeholder image
             thumbnail: "https://picsum.photos/seed/water1/300/200",
-            url: "https://example.com/blog1",
+            url: "https://etrlabs.com/different-types-of-ways-to-test-your-water-quality/?srsltid=AfmBOopxgx52GbV05enQp99gvBVVH21IUJFo3KLNNou2goieIKMccKCT",
           },
           {
             id: "b2",
             title: "Understanding pH Levels in Drinking Water",
             source: "HealthLine",
             thumbnail: "https://picsum.photos/seed/water2/300/200",
-            url: "https://example.com/blog2",
+            url: "hhttps://www.healthline.com/health/ph-of-drinking-water",
           },
           {
             id: "b3",
             title: "The Global Water Crisis: What You Need to Know",
             source: "WHO",
             thumbnail: "https://picsum.photos/seed/water3/300/200",
-            url: "https://example.com/blog3",
+            url: "https://www.who.int/news-room/fact-sheets/detail/drinking-water",
           },
         ],
       });
