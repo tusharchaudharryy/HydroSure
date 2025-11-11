@@ -74,5 +74,5 @@ yarn-error.log
 !.yarn/sdks
 !.yarn/versions
 
-src/
+src_/
 HydroSure_AI/
