@@ -1,15 +1,13 @@
-# backend/langgraph_workflow/graph.py
 import operator
 from typing import TypedDict, List, Dict, Any, Optional
 from langgraph.graph import StateGraph, END
 from backend.api.schemas import MatchResult
 
-# --- Define the State (Final) ---
 class AnalysisState(TypedDict):
     """
     The state passed between the LangGraph nodes.
     """
-    # Input
+
     strip_image_b64: str
     chart_image_b64: str 
     latitude: Optional[float]
@@ -17,30 +15,24 @@ class AnalysisState(TypedDict):
     strip_id: str
     timestamp: str
     
-    # Internal State
     validation_status: str 
     
-    # NEW: Raw LLM output for the confidence node
     llm_raw_output: Optional[List[Dict[str, Any]]] 
 
-    # Final Output
-    match_results: Optional[List[MatchResult]] # This will be created by the confidence node
+    match_results: Optional[List[MatchResult]] 
     ai_summary: Optional[str]
     location_summary: Optional[str]
     error_message: Optional[str]
 
-
-# --- Conditional Edges ---
 def decide_next_step(state: AnalysisState) -> str:
     """Decides whether to proceed to summary or stop."""
     if state.get("error_message"):
-        return END # Stop if LLM analysis failed
+        return END 
     if state.get("validation_status") == "ALL_VALID":
-        return "calculate_confidence" # Proceed to confidence calculation
+        return "calculate_confidence" 
     else:
         return END # Fallback
 
-# --- Build the Graph (Final) ---
 def build_analysis_graph():
     """Defines and compiles the LangGraph workflow with confidence scoring."""
     

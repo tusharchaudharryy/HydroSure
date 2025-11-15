@@ -1,11 +1,6 @@
-# backend/api/schemas.py
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any, Optional
 
-# --- Request Schema (We don't use this for file uploads) ---
-# AnalysisRequest is no longer needed
-
-# --- Response Schemas ---
 
 class MatchResult(BaseModel):
     """Schema for a single parameter match result."""
@@ -20,7 +15,6 @@ class AnalysisResponse(BaseModel):
     strip_id: str = Field(..., description="Unique ID for this analysis run.")
     timestamp: str = Field(..., description="UTC timestamp of the analysis.")
     
-    # --- NEW FIELD ---
     location_summary: Optional[str] = Field(None, description="A brief summary of the test location, if provided.")
     
     ai_summary: Optional[str] = Field(None, description="A natural language summary and interpretation of the results by the LLM.")
